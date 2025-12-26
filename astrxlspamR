@@ -1,84 +1,69 @@
--- discord.gg/titanzhub
--- 4strxl spamz | Fully Remade & Fixed
+-- 4strxl spamz - GUI FORCE LOAD TEST (FINAL)
 
-local env = getgenv and getgenv() or _G
-if env.__4STRXL_SPAMZ__ then return end
-env.__4STRXL_SPAMZ__ = true
-
-repeat task.wait() until game:IsLoaded()
-
--- SERVICES
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StarterGui = game:GetService("StarterGui")
-local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
--- COLORS
-local PURPLE = Color3.fromRGB(190, 160, 255)
-local PURPLE_DARK = Color3.fromRGB(155, 125, 215)
-local BG = Color3.fromRGB(22, 22, 26)
-local BTN = Color3.fromRGB(40, 40, 48)
-
-local COMMANDS = {"rocket", "balloon", "inverse", "tiny"}
-
--- NOTIFY
-local function notify(t, d, s)
-    pcall(function()
-        StarterGui:SetCore("SendNotification", {
-            Title = t,
-            Text = d,
-            Duration = s or 3
-        })
-    end)
+-- HARD WAIT
+while not LocalPlayer do
+    Players.PlayerAdded:Wait()
+    LocalPlayer = Players.LocalPlayer
 end
 
--- FIND REMOTE
-local Remote
-do
-    local start = os.clock()
-    repeat
-        local pkg = ReplicatedStorage:FindFirstChild("Packages")
-        if pkg and pkg:FindFirstChild("Net") then
-            Remote = pkg.Net:FindFirstChild("RE/AdminPanelService/ExecuteCommand")
-        end
-        task.wait(0.1)
-    until Remote or os.clock() - start > 6
-end
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui", 10)
+if not PlayerGui then return end
 
-if not Remote then
-    notify("4strxl spamz", "Admin remote not found", 5)
-    return
-end
-
--- SAFE GUI PARENT
-local guiParent
+-- DESTROY OLD
 pcall(function()
-    if CoreGui then guiParent = CoreGui end
+    if PlayerGui:FindFirstChild("4strxl_spamz_gui") then
+        PlayerGui["4strxl_spamz_gui"]:Destroy()
+    end
 end)
-if not guiParent then
-    guiParent = LocalPlayer:WaitForChild("PlayerGui")
-end
 
--- GUI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "4strxl_spamz_gui"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.IgnoreGuiInset = true
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-ScreenGui.Parent = guiParent
+-- SCREEN GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "4strxl_spamz_gui"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Parent = PlayerGui
 
-local Main = Instance.new("Frame", ScreenGui)
-Main.Size = UDim2.fromOffset(300, 380)
-Main.Position = UDim2.fromOffset(40, 120)
-Main.BackgroundColor3 = BG
-Main.BorderSizePixel = 0
+-- MAIN FRAME
+local frame = Instance.new("Frame")
+frame.Size = UDim2.fromOffset(320, 200)
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.Position = UDim2.fromScale(0.5, 0.5)
+frame.BackgroundColor3 = Color3.fromRGB(190, 160, 255) -- light purple
+frame.BorderSizePixel = 0
+frame.Parent = gui
 
-Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 16)
 
-local Stroke = Instance.new("UIStroke", Main)
-Stroke.Color = PURPLE
-Stroke.Transparency = 0.25
+-- TITLE
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 50)
+title.BackgroundTransparency = 1
+title.Text = "4strxl spamz"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 26
+title.TextColor3 = Color3.fromRGB(20, 20, 20)
+title.Parent = frame
 
--- TOP BAR
-local Top = Instance.new("Fra
+-- BODY TEXT
+local body = Instance.new("TextLabel")
+body.Position = UDim2.fromOffset(0, 60)
+body.Size = UDim2.new(1, 0, 1, -60)
+body.BackgroundTransparency = 1
+body.TextWrapped = true
+body.Text = "If you can see this panel,\nYOUR EXECUTOR SUPPORTS GUIs."
+body.Font = Enum.Font.Gotham
+body.TextSize = 16
+body.TextColor3 = Color3.fromRGB(30, 30, 30)
+body.Parent = frame
+
+-- FORCE VISIBILITY EVERY FRAME
+RunService.RenderStepped:Connect(function()
+    if gui.Parent ~= PlayerGui then
+        gui.Parent = PlayerGui
+    end
+    frame.Visible = true
+end)
