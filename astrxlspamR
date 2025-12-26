@@ -1,3 +1,6 @@
+-- discord.gg/titanzhub
+-- Edited UI: 4strxl spamz | Light Purple Theme
+
 local v0 = getgenv and getgenv() or _G
 if v0.__XD_SPAM_PANEL__ then
     return
