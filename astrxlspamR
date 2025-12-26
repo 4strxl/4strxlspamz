@@ -1,69 +1,108 @@
--- 4strxl spamz - GUI FORCE LOAD TEST (FINAL)
+-- 4strxl spamz | FINAL WORKING HUB
+-- Light Purple UI | PlayerGui Safe
 
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
 local LocalPlayer = Players.LocalPlayer
 
--- HARD WAIT
-while not LocalPlayer do
-    Players.PlayerAdded:Wait()
-    LocalPlayer = Players.LocalPlayer
+repeat task.wait() until LocalPlayer and LocalPlayer:FindFirstChild("PlayerGui")
+
+-- CONFIG
+local TITLE_TEXT = "4strxl spamz"
+local COMMANDS = {"rocket", "balloon", "inverse", "tiny"}
+
+-- COLORS
+local PURPLE = Color3.fromRGB(190,160,255)
+local PURPLE_DARK = Color3.fromRGB(160,130,220)
+local BG = Color3.fromRGB(24,24,30)
+local BTN = Color3.fromRGB(40,40,52)
+
+-- NOTIFY
+local function notify(t, d)
+    pcall(function()
+        StarterGui:SetCore("SendNotification", {
+            Title = t,
+            Text = d,
+            Duration = 3
+        })
+    end)
 end
 
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui", 10)
-if not PlayerGui then return end
-
--- DESTROY OLD
-pcall(function()
-    if PlayerGui:FindFirstChild("4strxl_spamz_gui") then
-        PlayerGui["4strxl_spamz_gui"]:Destroy()
-    end
+-- FIND REMOTE (SAFE)
+local Remote
+task.spawn(function()
+    local start = os.clock()
+    repeat
+        local pkg = ReplicatedStorage:FindFirstChild("Packages")
+        if pkg and pkg:FindFirstChild("Net") then
+            Remote = pkg.Net:FindFirstChild("RE/AdminPanelService/ExecuteCommand")
+        end
+        task.wait(0.2)
+    until Remote or os.clock() - start > 8
 end)
 
--- SCREEN GUI
+-- CLEAN OLD GUI
+pcall(function()
+    local old = LocalPlayer.PlayerGui:FindFirstChild("4strxl_spamz_gui")
+    if old then old:Destroy() end
+end)
+
+-- GUI
 local gui = Instance.new("ScreenGui")
 gui.Name = "4strxl_spamz_gui"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
-gui.Parent = PlayerGui
+gui.Parent = LocalPlayer.PlayerGui
 
--- MAIN FRAME
-local frame = Instance.new("Frame")
-frame.Size = UDim2.fromOffset(320, 200)
-frame.AnchorPoint = Vector2.new(0.5, 0.5)
-frame.Position = UDim2.fromScale(0.5, 0.5)
-frame.BackgroundColor3 = Color3.fromRGB(190, 160, 255) -- light purple
-frame.BorderSizePixel = 0
-frame.Parent = gui
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.fromOffset(300, 380)
+main.Position = UDim2.fromOffset(60, 120)
+main.BackgroundColor3 = BG
+main.BorderSizePixel = 0
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 14)
 
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 16)
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = PURPLE
+stroke.Transparency = 0.25
 
--- TITLE
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 50)
+-- TOP BAR
+local top = Instance.new("Frame", main)
+top.Size = UDim2.new(1,0,0,38)
+top.BackgroundColor3 = PURPLE_DARK
+top.BorderSizePixel = 0
+top.ClipsDescendants = true
+Instance.new("UICorner", top).CornerRadius = UDim.new(0,14)
+
+local title = Instance.new("TextLabel", top)
+title.Size = UDim2.new(1,-90,1,0)
+title.Position = UDim2.fromOffset(12,0)
 title.BackgroundTransparency = 1
-title.Text = "4strxl spamz"
+title.Text = TITLE_TEXT
 title.Font = Enum.Font.GothamBold
-title.TextSize = 26
-title.TextColor3 = Color3.fromRGB(20, 20, 20)
-title.Parent = frame
+title.TextSize = 16
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.TextColor3 = Color3.fromRGB(245,245,255)
 
--- BODY TEXT
-local body = Instance.new("TextLabel")
-body.Position = UDim2.fromOffset(0, 60)
-body.Size = UDim2.new(1, 0, 1, -60)
-body.BackgroundTransparency = 1
-body.TextWrapped = true
-body.Text = "If you can see this panel,\nYOUR EXECUTOR SUPPORTS GUIs."
-body.Font = Enum.Font.Gotham
-body.TextSize = 16
-body.TextColor3 = Color3.fromRGB(30, 30, 30)
-body.Parent = frame
+local refresh = Instance.new("TextButton", top)
+refresh.Size = UDim2.fromOffset(78,26)
+refresh.Position = UDim2.new(1,-84,0,6)
+refresh.Text = "Refresh"
+refresh.Font = Enum.Font.Gotham
+refresh.TextSize = 14
+refresh.TextColor3 = Color3.fromRGB(255,255,255)
+refresh.BackgroundColor3 = PURPLE
+refresh.BorderSizePixel = 0
+Instance.new("UICorner", refresh).CornerRadius = UDim.new(0,8)
 
--- FORCE VISIBILITY EVERY FRAME
-RunService.RenderStepped:Connect(function()
-    if gui.Parent ~= PlayerGui then
-        gui.Parent = PlayerGui
-    end
-    frame.Visible = true
-end)
+-- CONTENT
+local holder = Instance.new("Frame", main)
+holder.Position = UDim2.fromOffset(8,46)
+holder.Size = UDim2.new(1,-16,1,-54)
+holder.BackgroundTransparency = 1
+
+local list = Instance.new("ScrollingFrame", holder)
+list.Size = UDim2.fromScale(1,1)
+list.CanvasSize = UDim2.new()
+list.ScrollBarThickness = 6
+l
