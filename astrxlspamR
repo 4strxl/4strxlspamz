@@ -1,169 +1,192 @@
 -- discord.gg/titanzhub
--- Edited UI: 4strxl spamz | Light Purple Theme
+-- Fixed + Edited: 4strxl spamz (Light Purple)
 
-local v0 = getgenv and getgenv() or _G
-if v0.__XD_SPAM_PANEL__ then
-    return
-else
-    v0.__XD_SPAM_PANEL__ = true
-    repeat task.wait() until game:IsLoaded()
+local g = getgenv and getgenv() or _G
+if g.__4STRXL_SPAM__ then return end
+g.__4STRXL_SPAM__ = true
 
-    local Players = game:GetService("Players")
-    local ReplicatedStorage = game:GetService("ReplicatedStorage")
-    local StarterGui = game:GetService("StarterGui")
-    local CoreGui = game:GetService("CoreGui")
-    local LocalPlayer = Players.LocalPlayer
+repeat task.wait() until game:IsLoaded()
 
-    local ACCENT = Color3.fromRGB(190, 160, 255) -- light purple
-    local ACCENT_DARK = Color3.fromRGB(160, 130, 220)
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
+local CoreGui = game:GetService("CoreGui")
+local LocalPlayer = Players.LocalPlayer
 
-    local cmds = {"rocket", "balloon", "inverse", "tiny"}
-    local notifyEnabled = true
+-- COLORS
+local PURPLE = Color3.fromRGB(190, 160, 255)
+local PURPLE_DARK = Color3.fromRGB(160, 130, 220)
+local BG = Color3.fromRGB(22, 22, 26)
 
-    local function notify(t, d, s)
-        if not notifyEnabled then return end
-        pcall(function()
-            StarterGui:SetCore("SendNotification", {
-                Title = t,
-                Text = d,
-                Duration = s or 3
-            })
-        end)
-    end
+local COMMANDS = {"rocket", "balloon", "inverse", "tiny"}
 
-    local Remote
-    do
-        local start = os.clock()
-        repeat
-            local pkg = ReplicatedStorage:FindFirstChild("Packages")
-            if pkg and pkg:FindFirstChild("Net") then
-                Remote = pkg.Net:FindFirstChild("RE/AdminPanelService/ExecuteCommand")
-            end
-            task.wait(0.1)
-        until Remote or os.clock() - start > 6
-    end
-
-    if not Remote then
-        notify("Error", "Remote not found", 5)
-        return
-    end
-
-    local function display(plr)
-        if plr.DisplayName ~= "" and plr.DisplayName ~= plr.Name then
-            return plr.DisplayName .. " (@" .. plr.Name .. ")"
-        end
-        return "@" .. plr.Name
-    end
-
-    local ScreenGui = Instance.new("ScreenGui", CoreGui)
-    ScreenGui.Name = "4strxl_spam_gui"
-    ScreenGui.ResetOnSpawn = false
-
-    local Main = Instance.new("Frame", ScreenGui)
-    Main.Size = UDim2.fromOffset(300, 380)
-    Main.Position = UDim2.fromOffset(40, 120)
-    Main.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-    Main.BorderSizePixel = 0
-
-    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
-
-    local Stroke = Instance.new("UIStroke", Main)
-    Stroke.Color = ACCENT
-    Stroke.Thickness = 1
-    Stroke.Transparency = 0.2
-
-    local Top = Instance.new("Frame", Main)
-    Top.Size = UDim2.new(1, 0, 0, 36)
-    Top.BackgroundColor3 = ACCENT_DARK
-    Top.BorderSizePixel = 0
-    Instance.new("UICorner", Top).CornerRadius = UDim.new(0, 12)
-
-    local Title = Instance.new("TextLabel", Top)
-    Title.Size = UDim2.new(1, -90, 1, 0)
-    Title.Position = UDim2.fromOffset(12, 0)
-    Title.BackgroundTransparency = 1
-    Title.Font = Enum.Font.GothamBold
-    Title.TextSize = 16
-    Title.TextXAlignment = Left
-    Title.TextColor3 = Color3.fromRGB(245, 245, 255)
-    Title.Text = "4strxl spamz"
-
-    local Refresh = Instance.new("TextButton", Top)
-    Refresh.Text = "Refresh"
-    Refresh.Font = Enum.Font.Gotham
-    Refresh.TextSize = 14
-    Refresh.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Refresh.BackgroundColor3 = ACCENT
-    Refresh.Size = UDim2.fromOffset(80, 26)
-    Refresh.Position = UDim2.new(1, -86, 0, 5)
-    Instance.new("UICorner", Refresh).CornerRadius = UDim.new(0, 8)
-
-    local Holder = Instance.new("Frame", Main)
-    Holder.Size = UDim2.new(1, -16, 1, -52)
-    Holder.Position = UDim2.fromOffset(8, 44)
-    Holder.BackgroundTransparency = 1
-
-    local List = Instance.new("ScrollingFrame", Holder)
-    List.Size = UDim2.fromScale(1, 1)
-    List.CanvasSize = UDim2.new()
-    List.ScrollBarThickness = 6
-    List.BackgroundTransparency = 1
-    List.BorderSizePixel = 0
-
-    local Layout = Instance.new("UIListLayout", List)
-    Layout.Padding = UDim.new(0, 6)
-
-    local function spam(plr)
-        task.spawn(function()
-            for _, cmd in ipairs(cmds) do
-                pcall(function()
-                    Remote:FireServer(plr, cmd)
-                end)
-            end
-            notify("Sent", plr.Name .. " spammed (" .. #cmds .. " cmds)", 2)
-        end)
-    end
-
-    local function makeButton(plr)
-        local b = Instance.new("TextButton")
-        b.Size = UDim2.new(1, -6, 0, 34)
-        b.TextXAlignment = Left
-        b.Text = "  " .. display(plr)
-        b.Font = Enum.Font.Gotham
-        b.TextSize = 14
-        b.TextColor3 = Color3.fromRGB(240, 240, 255)
-        b.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
-        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
-
-        b.MouseEnter:Connect(function()
-            b.BackgroundColor3 = ACCENT_DARK
-        end)
-        b.MouseLeave:Connect(function()
-            b.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
-        end)
-        b.Activated:Connect(function()
-            spam(plr)
-        end)
-        return b
-    end
-
-    local function refresh()
-        for _, c in ipairs(List:GetChildren()) do
-            if c:IsA("TextButton") then c:Destroy() end
-        end
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p ~= LocalPlayer then
-                makeButton(p).Parent = List
-            end
-        end
-        task.wait()
-        List.CanvasSize = UDim2.fromOffset(0, Layout.AbsoluteContentSize.Y + 10)
-    end
-
-    Refresh.MouseButton1Click:Connect(refresh)
-    Players.PlayerAdded:Connect(refresh)
-    Players.PlayerRemoving:Connect(refresh)
-
-    refresh()
-    notify("4strxl spamz", "Light purple hub loaded", 4)
+local function notify(t, d, s)
+    pcall(function()
+        StarterGui:SetCore("SendNotification", {
+            Title = t,
+            Text = d,
+            Duration = s or 3
+        })
+    end)
 end
+
+-- FIND REMOTE
+local Remote
+do
+    local start = os.clock()
+    repeat
+        local pkg = ReplicatedStorage:FindFirstChild("Packages")
+        if pkg and pkg:FindFirstChild("Net") then
+            Remote = pkg.Net:FindFirstChild("RE/AdminPanelService/ExecuteCommand")
+        end
+        task.wait(0.1)
+    until Remote or os.clock() - start > 6
+end
+
+if not Remote then
+    notify("Error", "Admin remote not found", 5)
+    return
+end
+
+-- GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "4strxl_spam_gui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = CoreGui
+
+local Main = Instance.new("Frame", ScreenGui)
+Main.Size = UDim2.fromOffset(300, 380)
+Main.Position = UDim2.fromOffset(40, 120)
+Main.BackgroundColor3 = BG
+Main.BorderSizePixel = 0
+
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
+
+local Stroke = Instance.new("UIStroke", Main)
+Stroke.Color = PURPLE
+Stroke.Transparency = 0.2
+
+-- TOP BAR
+local Top = Instance.new("Frame", Main)
+Top.Size = UDim2.new(1, 0, 0, 36)
+Top.BackgroundColor3 = PURPLE_DARK
+Top.BorderSizePixel = 0
+Top.ClipsDescendants = true
+Instance.new("UICorner", Top).CornerRadius = UDim.new(0, 12)
+
+local Title = Instance.new("TextLabel", Top)
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1, -90, 1, 0)
+Title.Position = UDim2.fromOffset(12, 0)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.TextColor3 = Color3.fromRGB(245, 245, 255)
+Title.Text = "4strxl spamz"
+
+local Refresh = Instance.new("TextButton", Top)
+Refresh.Text = "Refresh"
+Refresh.Font = Enum.Font.Gotham
+Refresh.TextSize = 14
+Refresh.TextColor3 = Color3.fromRGB(255,255,255)
+Refresh.BackgroundColor3 = PURPLE
+Refresh.Size = UDim2.fromOffset(80, 26)
+Refresh.Position = UDim2.new(1, -86, 0, 5)
+Refresh.BorderSizePixel = 0
+Instance.new("UICorner", Refresh).CornerRadius = UDim.new(0, 8)
+
+-- CONTENT
+local Holder = Instance.new("Frame", Main)
+Holder.Size = UDim2.new(1, -16, 1, -52)
+Holder.Position = UDim2.fromOffset(8, 44)
+Holder.BackgroundTransparency = 1
+
+local List = Instance.new("ScrollingFrame", Holder)
+List.Size = UDim2.fromScale(1,1)
+List.CanvasSize = UDim2.new()
+List.ScrollBarThickness = 6
+List.BackgroundTransparency = 1
+List.BorderSizePixel = 0
+
+local Layout = Instance.new("UIListLayout", List)
+Layout.Padding = UDim.new(0, 6)
+
+-- DRAGGING
+do
+    local dragging, startPos, startFrame
+    Top.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            startPos = i.Position
+            startFrame = Main.Position
+            i.Changed:Connect(function()
+                if i.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    Top.InputChanged:Connect(function(i)
+        if dragging and i.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = i.Position - startPos
+            Main.Position = UDim2.fromOffset(
+                startFrame.X.Offset + delta.X,
+                startFrame.Y.Offset + delta.Y
+            )
+        end
+    end)
+end
+
+-- FUNCTIONS
+local function spam(plr)
+    task.spawn(function()
+        for _, cmd in ipairs(COMMANDS) do
+            pcall(function()
+                Remote:FireServer(plr, cmd)
+            end)
+        end
+        notify("Sent", plr.Name .. " spammed", 2)
+    end)
+end
+
+local function makeButton(plr)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(1, -6, 0, 34)
+    b.Text = "  @" .. plr.Name
+    b.Font = Enum.Font.Gotham
+    b.TextSize = 14
+    b.TextXAlignment = Enum.TextXAlignment.Left
+    b.TextColor3 = Color3.fromRGB(240,240,255)
+    b.BackgroundColor3 = Color3.fromRGB(40,40,48)
+    b.BorderSizePixel = 0
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
+
+    b.MouseEnter:Connect(function()
+        b.BackgroundColor3 = PURPLE_DARK
+    end)
+    b.MouseLeave:Connect(function()
+        b.BackgroundColor3 = Color3.fromRGB(40,40,48)
+    end)
+    b.Activated:Connect(function()
+        spam(plr)
+    end)
+
+    return b
+end
+
+local function refresh()
+    for _, v in ipairs(List:GetChildren()) do
+        if v:IsA("TextButton") then v:Destroy() end
+    end
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer then
+            makeButton(p).Parent = List
+        end
+    end
+    task.wait()
+    List.CanvasSize = UDim2.fromOffset(0, Layout.AbsoluteContentSize.Y + 10)
+end
+
+Refresh.MouseButton1Click:Connect(refresh)
+Players.PlayerAdded:Connect(refresh)
+Players.PlayerRemoving:Connect(refres
